@@ -8,10 +8,10 @@ After implementing the base algorithm, our team will experiment with its paramet
 
 ## Team Members
 
-- **Idora Ban** - GitHub: [ind1xa]
-- **Simon Hehnen** - GitHub: [SimonTC35]
-- **Iva Idzojtic** - GitHub: [viii-debug]
-- **Lukas Pucher** - GitHub: [DeinschneeweicherOnkel]
+- **Idora Ban** - GitHub: ind1xa
+- **Simon Hehnen** - GitHub: SimonTC35
+- **Iva Idzojtic** - GitHub: viii-debug
+- **Lukas Pucher** - GitHub: DeinschneeweicherOnkel
 
 ## Project Plan
 
