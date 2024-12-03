@@ -11,7 +11,7 @@ class Simulation:
         self.rho_0 = 45
         self.rho_v = 1000 # vision radius of dog
         self.N = len(p)  # Number of sheep
-        self.T = 0.1 # sampling period
+        self.T = 0.001 # sampling period
 
         self.k = 0
 
@@ -101,7 +101,7 @@ class Simulation:
         # the positions step by step
 
         u_k = 0
-        print(self.q)
+        # print(self.q)
         if Q_l != [] and np.allclose(Q_l, self.q) and L_c > self.theta_t:
             self.lambda_k = 0
             if np.linalg.norm(self.q - D_r) >= self.r_a:
@@ -120,11 +120,75 @@ class Simulation:
             else:
                 u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_r), ((- self.q + D_r) / np.linalg.norm(- self.q + D_r)))
 
-        self.q = self.q + self.T*u_k
+        # update dog position
+        self.q = self.q + self.T * u_k
 
+        # update sheep positions
+        velocities = []
+        for sheep_index in range(self.N):
+            v_di = self.phi(np.linalg.norm(p_qi[sheep_index])) * (p_qi[sheep_index] / np.linalg.norm(p_qi[sheep_index]))
+            v_si = self.compute_sheep_velocity(sheep_index)
+            v_i = v_di + np.dot(rotation_matrix(self.theta), v_si)
+            velocities.append(v_i)
+
+        self.p = self.p + self.T * np.array(velocities)
 
         self.k += 1
         return self.q, self.p
+    
+    def compute_sheep_velocity(self, i):
+        """
+        Compute the velocity of sheep i due to all other sheep in the herd.
+    
+        :param i: Index of the sheep for which to compute the velocity.
+        :return: The velocity of sheep i due to other sheep.
+        """
+        v_si = np.zeros(2)  # Initialize the velocity vector for sheep i
+        
+        for j in range(self.N):
+            if i != j:
+                # Compute the distance between sheep i and sheep j
+                distance = np.linalg.norm(self.p[i] - self.p[j])
+                
+                # Compute the repulsive force using psi(x)
+                repulsive_force = self.psi(distance)
+                
+                # Compute the direction from sheep i to sheep j
+                direction = self.p[i] - self.p[j]
+                unit_direction = direction / np.linalg.norm(direction)
+                
+                # Add the force to the velocity
+                v_si += repulsive_force * unit_direction
+                
+        return v_si
+
+    def psi(self, x):
+        """
+        Repulsive force function between sheep based on their distance.
+        
+        :param x: The distance between two sheep.
+        :return: The magnitude of the velocity vector due to other sheep.
+        """
+        if self.rho_s < x <= self.rho_r:
+            return self.beta * (1 / (x - self.rho_s) - 1 / (self.rho_r - self.rho_s))
+        elif self.rho_r < x <= self.rho_g:
+            return 0
+        elif self.rho_g < x <= self.rho_d:
+            return self.gamma * (x - self.rho_g)
+        else:
+            return 0
+
+    def phi(self, x):
+        """
+        Repulsive force function for the sheepdog's effect on the sheep.
+        
+        :param x: The distance between the sheep and the sheepdog.
+        :return: The magnitude of the velocity vector due to the sheepdog.
+        """
+        if 0 < x <= self.rho_n:
+            return self.alpha * (1 / x - 1 / self.rho_n)
+        else:
+            return 0
 
     def left_right_set(self):
         Q_l = []
@@ -229,7 +293,7 @@ def rotation_matrix(theta):
 def cosine_sim(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
-def animate_simulation(sim, max_steps=100, interval=500):
+def animate_simulation(sim, max_steps=100, interval=100):
     """
     Animate the sheepdog simulation.
 
@@ -305,4 +369,4 @@ if __name__ == "__main__":
     # simulation = Simulation(easy_dog_position, easy_sheep_positions,  easy_destination)
     simulation = Simulation(paper_dog_position, paper_sheep_positions,  paper_destination)
 
-    animate_simulation(simulation)
+    animate_simulation(simulation, max_steps=50000)
