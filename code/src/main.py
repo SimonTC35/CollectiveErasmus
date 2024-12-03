@@ -72,7 +72,7 @@ class Simulation:
         V = self.visible_sheep() # all shepp visible from the dogs POV
         # herd_center = self.herd_center(V) # herd center of the visible sheep
 
-        P_s = self.sheep_herd_polygon() # the sheep herd polygon (a convex hull with sheep as verticies)
+        # P_s = self.sheep_herd_polygon() # the sheep herd polygon (a convex hull with sheep as verticies)
 
 
         D_cd = (self.p_d - self.p) / np.linalg.norm(self.p_d - self.p)
@@ -96,12 +96,11 @@ class Simulation:
         R_c = cosine_sim(D_cd, self.q-C_l)
 
 
-
         # if wee have all variables, we simply can finish the algo and update
         # the positions step by step
 
         u_k = 0
-        # print(self.q)
+        print(self.p)
         if Q_l != [] and np.allclose(Q_l, self.q) and L_c > self.theta_t:
             self.lambda_k = 0
             if np.linalg.norm(self.q - D_r) >= self.r_a:
@@ -126,7 +125,11 @@ class Simulation:
         # update sheep positions
         velocities = []
         for sheep_index in range(self.N):
-            v_di = self.phi(np.linalg.norm(p_qi[sheep_index])) * (p_qi[sheep_index] / np.linalg.norm(p_qi[sheep_index]))
+            norm_p_qi = np.linalg.norm(p_qi[sheep_index])
+            if norm_p_qi > 1e-8:
+                v_di = self.phi(norm_p_qi) * (p_qi[sheep_index] / norm_p_qi)
+            else:
+                v_di = np.zeros_like(p_qi[sheep_index])
             v_si = self.compute_sheep_velocity(sheep_index)
             v_i = v_di + np.dot(rotation_matrix(self.theta), v_si)
             velocities.append(v_i)
@@ -155,7 +158,10 @@ class Simulation:
                 
                 # Compute the direction from sheep i to sheep j
                 direction = self.p[i] - self.p[j]
-                unit_direction = direction / np.linalg.norm(direction)
+                if np.linalg.norm(direction) > 1e-8:  # Use a small epsilon to avoid numerical errors
+                    unit_direction = direction / np.linalg.norm(direction)
+                else:
+                    unit_direction = np.zeros_like(direction)  # Assign a zero vector
                 
                 # Add the force to the velocity
                 v_si += repulsive_force * unit_direction
@@ -169,6 +175,8 @@ class Simulation:
         :param x: The distance between two sheep.
         :return: The magnitude of the velocity vector due to other sheep.
         """
+        if x <= self.rho_s:
+            return 0  # Avoid invalid values for too-small distances
         if self.rho_s < x <= self.rho_r:
             return self.beta * (1 / (x - self.rho_s) - 1 / (self.rho_r - self.rho_s))
         elif self.rho_r < x <= self.rho_g:
@@ -185,6 +193,8 @@ class Simulation:
         :param x: The distance between the sheep and the sheepdog.
         :return: The magnitude of the velocity vector due to the sheepdog.
         """
+        if x <= 0:
+            return 0  # Prevent invalid behavior for non-positive distances
         if 0 < x <= self.rho_n:
             return self.alpha * (1 / x - 1 / self.rho_n)
         else:
@@ -293,7 +303,7 @@ def rotation_matrix(theta):
 def cosine_sim(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
-def animate_simulation(sim, max_steps=100, interval=100):
+def animate_simulation(sim, max_steps=100, interval=10):
     """
     Animate the sheepdog simulation.
 
