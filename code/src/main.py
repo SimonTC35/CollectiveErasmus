@@ -9,10 +9,9 @@ class Simulation:
         # Constants and initial positions
         self.p_d = p_d  # Destination position
         self.rho_0 = 45
-        self.rho_v = 50 # vision radius of dog
+        self.rho_v = 1000 # vision radius of dog
         self.N = len(p)  # Number of sheep
-        self.T = 1 # sampling period
-
+        self.T = 0.1 # sampling period
 
         self.k = 0
 
@@ -38,11 +37,12 @@ class Simulation:
         self.gamma_a = 450  # Gamma A constant
         self.gamma_b = 375  # Gamma B constant
 
-        self.theta_t = self.alpha_i * (np.pi / 180) * np.sin(self.omega_i * self.k * self.T)
-        self.theta_r = 1
-        self.theta_l = 1
+        self.theta = self.alpha_i * (np.pi / 180) * np.sin(self.omega_i * self.k * self.T)
+        self.theta_t = 2 * np.pi / 3
+        self.theta_r = np.pi / 4
+        self.theta_l = -np.pi / 4
 
-        self.lamda_k = 1
+        self.lambda_k = 1
 
 
     def run_simulation(self, max_steps=1000):
@@ -65,9 +65,9 @@ class Simulation:
         Perform one step of the simulation.
         In the paper algorithm this is line 6
         """
+
         p_qi = self.p - self.q
         p_di = self.p - self.p_d
-
 
         V = self.visible_sheep() # all shepp visible from the dogs POV
         # herd_center = self.herd_center(V) # herd center of the visible sheep
@@ -81,6 +81,15 @@ class Simulation:
         D_l, D_r = self.left_most_right_most_sheep(V, self.q) # left most and right most sheep from the dogs POV
         C_l, C_r = self.left_most_right_most_sheep(V, self.p_d) # left most and right most sheep from the destinations POV
 
+        if D_l is None:
+            D_l = self.q
+        if D_r is None:
+            D_r = self.q
+        if C_l is None:
+            C_l = self.p_d
+        if C_r is None:
+            C_r = self.p_d
+
         Q_l, Q_r = self.left_right_set()
 
         L_c = cosine_sim(D_cd, self.q-C_r)
@@ -92,23 +101,24 @@ class Simulation:
         # the positions step by step
 
         u_k = 0
-        if np.allclose(Q_l, self.q) and L_c > self.theta_t:
+        print(self.q)
+        if Q_l != [] and np.allclose(Q_l, self.q) and L_c > self.theta_t:
             self.lambda_k = 0
             if np.linalg.norm(self.q - D_r) >= self.r_a:
-                u_k = self.gamma_a*((self.q - D_r) / np.linalg.norm(self.q - D_r))
+                u_k = self.gamma_a*(np.abs(self.q - D_r) / np.linalg.norm(np.abs(self.q - D_r)))
             else:
-                u_k = self.gamma_b*rotation_matrix(self.theta_r)*((self.q - D_r) / np.linalg.norm(self.q - D_r))
-        elif (np.allclose(Q_r, self.q) and R_c > self.theta_t) or self.lamda_k == 1:
+                u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_r), (np.abs(self.q - D_r) / np.linalg.norm(np.abs(self.q - D_r))))
+        elif Q_r != [] and (np.allclose(Q_r, self.q) and R_c > self.theta_t) or self.lambda_k == 1:
             self.lambda_k = 1
             if np.linalg.norm(self.q - D_l) >= self.r_a:
-                u_k = self.gamma_a*((self.q - D_l) / np.linalg.norm(self.q - D_l))
+                u_k = self.gamma_a*(np.abs((self.q - D_l)) / np.linalg.norm(np.abs(self.q - D_l)))
             else:
-                u_k = self.gamma_b*rotation_matrix(self.theta_l)*((self.q - D_l) / np.linalg.norm(self.q - D_l))
+                u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_l), (np.abs((self.q - D_l)) / np.linalg.norm(np.abs(self.q - D_l))))
         else:
             if np.linalg.norm(self.q - D_r) >= self.r_a:
-                u_k = self.gamma_a*((self.q - D_r) / np.linalg.norm(self.q - D_r))
+                u_k = self.gamma_a*(np.abs(self.q - D_r) / np.linalg.norm(np.abs(self.q - D_r)))
             else:
-                u_k = self.gamma_b*rotation_matrix(self.theta_r)*((self.q - D_r) / np.linalg.norm(self.q - D_r))
+                u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_r), (np.abs(self.q - D_r) / np.linalg.norm(np.abs(self.q - D_r))))
 
         self.q = self.q + self.T*u_k
 
@@ -175,6 +185,8 @@ class Simulation:
         return center
 
     def left_most_right_most_sheep(self, visible_sheep, source):
+        if len(visible_sheep) == 0:
+            return None, None
         relative_positions = visible_sheep - source
         angles = np.array([np.arctan2(pos[1], pos[0]) for pos in relative_positions])
 
@@ -217,7 +229,7 @@ def rotation_matrix(theta):
 def cosine_sim(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
-def animate_simulation(sim, max_steps=100, interval=200):
+def animate_simulation(sim, max_steps=100, interval=500):
     """
     Animate the sheepdog simulation.
 
