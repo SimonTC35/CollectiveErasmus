@@ -11,6 +11,10 @@ class Simulation:
         self.rho_0 = 45
         self.rho_v = 50 # vision radius of dog
         self.N = len(p)  # Number of sheep
+        self.T = 1 # sampling period
+
+
+        self.k = 0
 
         # Initial positions
         self.q = q.astype(np.float32) # dog position
@@ -33,6 +37,13 @@ class Simulation:
         self.r_a = 40  # Radius of attraction
         self.gamma_a = 450  # Gamma A constant
         self.gamma_b = 375  # Gamma B constant
+
+        self.theta_t = self.alpha_i * (np.pi / 180) * np.sin(self.omega_i * self.k * self.T)
+        self.theta_r = 1
+        self.theta_l = 1
+
+        self.lamda_k = 1
+
 
     def run_simulation(self, max_steps=1000):
         """
@@ -59,25 +70,76 @@ class Simulation:
 
 
         V = self.visible_sheep() # all shepp visible from the dogs POV
-        herd_center = self.herd_center(V) # herd center of the visible sheep
+        # herd_center = self.herd_center(V) # herd center of the visible sheep
 
         P_s = self.sheep_herd_polygon() # the sheep herd polygon (a convex hull with sheep as verticies)
 
 
-        D_cd = 0  # TODO I dont know what this o function from the paper is: Dcd (k) = o(pd − pc (k))
-        D_qd = 0  # TODO same here
+        D_cd = (self.p_d - self.p) / np.linalg.norm(self.p_d - self.p)
+        D_qd = (self.p_d - self.q) / np.linalg.norm(self.p_d - self.q)
 
         D_l, D_r = self.left_most_right_most_sheep(V, self.q) # left most and right most sheep from the dogs POV
         C_l, C_r = self.left_most_right_most_sheep(V, self.p_d) # left most and right most sheep from the destinations POV
 
-        Q_l, Q_r = 0, 0  # TODO
+        Q_l, Q_r = self.left_right_set()
 
-        L_c, R_c = 0, 0 # TODO here all previous variables come together
+        L_c = cosine_sim(D_cd, self.q-C_r)
+        R_c = cosine_sim(D_cd, self.q-C_l)
+
+
 
         # if wee have all variables, we simply can finish the algo and update
         # the positions step by step
 
+        u_k = 0
+        if np.allclose(Q_l, self.q) and L_c > self.theta_t:
+            self.lambda_k = 0
+            if np.linalg.norm(self.q - D_r) >= self.r_a:
+                u_k = self.gamma_a*((self.q - D_r) / np.linalg.norm(self.q - D_r))
+            else:
+                u_k = self.gamma_b*rotation_matrix(self.theta_r)*((self.q - D_r) / np.linalg.norm(self.q - D_r))
+        elif (np.allclose(Q_r, self.q) and R_c > self.theta_t) or self.lamda_k == 1:
+            self.lambda_k = 1
+            if np.linalg.norm(self.q - D_l) >= self.r_a:
+                u_k = self.gamma_a*((self.q - D_l) / np.linalg.norm(self.q - D_l))
+            else:
+                u_k = self.gamma_b*rotation_matrix(self.theta_l)*((self.q - D_l) / np.linalg.norm(self.q - D_l))
+        else:
+            if np.linalg.norm(self.q - D_r) >= self.r_a:
+                u_k = self.gamma_a*((self.q - D_r) / np.linalg.norm(self.q - D_r))
+            else:
+                u_k = self.gamma_b*rotation_matrix(self.theta_r)*((self.q - D_r) / np.linalg.norm(self.q - D_r))
+
+        self.q = self.q + self.T*u_k
+
+
+        self.k += 1
         return self.q, self.p
+
+    def left_right_set(self):
+        Q_l = []
+        Q_r = []
+
+        # Loop through all sheep positions
+        for sheep_position in self.p:
+            # Compute the vector pd - x (in this case sheepfold - sheep position)
+            direction_vector = self.p_d - sheep_position
+
+            # Normalize the direction vector
+            if np.linalg.norm(direction_vector) == 0:
+                continue  # Avoid division by zero if vectors coincide
+            unit_vector = direction_vector / np.linalg.norm(direction_vector)
+
+            # Calculate angle with respect to x-axis
+            angle = np.arctan2(unit_vector[1], unit_vector[0])  # Angle in radians
+
+            # Check if the angle falls in left-hand or right-hand regions
+            if 0 < angle <= np.pi:  # Right-hand region (S_r)
+                Q_r.append(sheep_position)
+            elif -np.pi < angle <= 0:  # Left-hand region (S_l)
+                Q_l.append(sheep_position)
+
+        return Q_l, Q_r
 
     def visible_sheep(self):
         """
@@ -137,6 +199,24 @@ class Simulation:
         distances = np.linalg.norm(self.p - self.p_d, axis=1)
         return np.all(distances <= self.rho_d)
 
+def rotation_matrix(theta):
+    """
+    Returns the 2D rotation matrix for a given angle theta.
+
+    Parameters:
+        theta (float): The angle in radians to rotate by.
+
+    Returns:
+        np.array: A 2x2 rotation matrix.
+    """
+    return np.array([
+        [np.cos(theta), -np.sin(theta)],
+        [np.sin(theta), np.cos(theta)]
+    ])
+
+def cosine_sim(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
 def animate_simulation(sim, max_steps=100, interval=200):
     """
     Animate the sheepdog simulation.
@@ -159,8 +239,8 @@ def animate_simulation(sim, max_steps=100, interval=200):
     ax.set_ylim(min_y, max_y)
 
     # Draw the destination circle
-    destination_circle = plt.Circle(sim.p_d, sim.r_d, color='black', fill=False, linewidth=1.5)
-    ax.add_artist(destination_circle)
+    # destination_circle = plt.Circle(sim.p_d, sim.r_d, color='black', fill=False, linewidth=1.5)
+    # ax.add_artist(destination_circle)
 
     # Initialize markers
     sheep_scatter = ax.scatter(sim.p[:, 0], sim.p[:, 1], c='blue', label='Sheep')
