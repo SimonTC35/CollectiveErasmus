@@ -105,20 +105,20 @@ class Simulation:
         if Q_l != [] and np.allclose(Q_l, self.q) and L_c > self.theta_t:
             self.lambda_k = 0
             if np.linalg.norm(self.q - D_r) >= self.r_a:
-                u_k = self.gamma_a*(np.abs(self.q - D_r) / np.linalg.norm(np.abs(self.q - D_r)))
+                u_k = self.gamma_a*((- self.q + D_r) / np.linalg.norm(- self.q + D_r))
             else:
-                u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_r), (np.abs(self.q - D_r) / np.linalg.norm(np.abs(self.q - D_r))))
+                u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_r), ((- self.q + D_r) / np.linalg.norm(- self.q + D_r)))
         elif Q_r != [] and (np.allclose(Q_r, self.q) and R_c > self.theta_t) or self.lambda_k == 1:
             self.lambda_k = 1
             if np.linalg.norm(self.q - D_l) >= self.r_a:
-                u_k = self.gamma_a*(np.abs((self.q - D_l)) / np.linalg.norm(np.abs(self.q - D_l)))
+                u_k = self.gamma_a*((-self.q + D_l) / np.linalg.norm(- self.q + D_l))
             else:
-                u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_l), (np.abs((self.q - D_l)) / np.linalg.norm(np.abs(self.q - D_l))))
+                u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_l), ((-self.q + D_l) / np.linalg.norm(- self.q + D_l)))
         else:
             if np.linalg.norm(self.q - D_r) >= self.r_a:
-                u_k = self.gamma_a*(np.abs(self.q - D_r) / np.linalg.norm(np.abs(self.q - D_r)))
+                u_k = self.gamma_a*((- self.q + D_r) / np.linalg.norm(- self.q + D_r))
             else:
-                u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_r), (np.abs(self.q - D_r) / np.linalg.norm(np.abs(self.q - D_r))))
+                u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_r), ((- self.q + D_r) / np.linalg.norm(- self.q + D_r)))
 
         self.q = self.q + self.T*u_k
 
