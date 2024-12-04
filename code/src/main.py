@@ -100,7 +100,6 @@ class Simulation:
         # the positions step by step
 
         u_k = 0
-        print(self.p)
         if Q_l != [] and np.allclose(Q_l, self.q) and L_c > self.theta_t:
             self.lambda_k = 0
             if np.linalg.norm(self.q - D_r) >= self.r_a:
@@ -176,14 +175,20 @@ class Simulation:
         :return: The magnitude of the velocity vector due to other sheep.
         """
         if x <= self.rho_s:
-            return 0  # Avoid invalid values for too-small distances
+            # Strong repulsion for safety zone
+            return self.beta * (1 / (x + 1e-8) - 1 / self.rho_s)
+            # return 0
         if self.rho_s < x <= self.rho_r:
+            # Mild repulsion in the repulsion zone
             return self.beta * (1 / (x - self.rho_s) - 1 / (self.rho_r - self.rho_s))
         elif self.rho_r < x <= self.rho_g:
+            # Neutral zone
             return 0
         elif self.rho_g < x <= self.rho_d:
+            # Attraction force in the attraction zone
             return self.gamma * (x - self.rho_g)
         else:
+            # Beyond attraction zone: No force
             return 0
 
     def phi(self, x):
@@ -303,7 +308,7 @@ def rotation_matrix(theta):
 def cosine_sim(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
-def animate_simulation(sim, max_steps=100, interval=10):
+def animate_simulation(sim, max_steps=100, interval=100):
     """
     Animate the sheepdog simulation.
 
@@ -325,15 +330,14 @@ def animate_simulation(sim, max_steps=100, interval=10):
     ax.set_ylim(min_y, max_y)
 
     # Draw the destination circle
-    # destination_circle = plt.Circle(sim.p_d, sim.r_d, color='black', fill=False, linewidth=1.5)
-    # ax.add_artist(destination_circle)
+    destination_circle = plt.Circle(sim.p_d, sim.rho_d, color='black', fill=False, linewidth=0.5)
+    ax.add_artist(destination_circle)
 
     # Initialize markers
-    sheep_scatter = ax.scatter(sim.p[:, 0], sim.p[:, 1], c='blue', label='Sheep')
-    dog_marker, = ax.plot(sim.q[0], sim.q[1], 'ro', label='Dog')
+    sheep_scatter = ax.scatter(sim.p[:, 0], sim.p[:, 1], c='blue', label='sheep')
+    dog_marker, = ax.plot(sim.q[0], sim.q[1], 'ro', label='sheepdog')
 
-    destination_marker, = ax.plot(sim.p_d[0], sim.p_d[1], 'ro', label='Dog')
-    ax.add_artist(destination_marker)
+    destination_marker, = ax.plot(sim.p_d[0], sim.p_d[1], 'k*', label='sheepfold')
 
     # Add legend
     ax.legend(loc='upper right')
