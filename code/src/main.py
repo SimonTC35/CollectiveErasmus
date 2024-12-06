@@ -5,6 +5,8 @@ from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 from scipy.spatial import ConvexHull
 
+from math_functions import *
+
 
 class Simulation:
     def __init__(self, q, p, p_d):
@@ -13,7 +15,7 @@ class Simulation:
         self.rho_0 = 45
         self.rho_v = 1000 # vision radius of dog
         self.N = len(p)  # Number of sheep
-        self.T = 0.001 # sampling period
+        self.T = 0.0001 # sampling period
 
         self.k = 0
 
@@ -84,10 +86,6 @@ class Simulation:
 
         L_c = cosine_sim(D_cd, self.q-C_r)
         R_c = cosine_sim(D_cd, self.q-C_l)
-
-
-        # if wee have all variables, we simply can finish the algo and update
-        # the positions step by step
 
         u_k = 0
         if Q_l != [] and np.allclose(Q_l, self.q) and L_c > self.theta_t:
@@ -254,15 +252,23 @@ class Simulation:
         return center
 
     def left_most_right_most_sheep(self, visible_sheep, source):
+        """
+        Identify the leftmost and rightmost visible sheep from the perspective of the source.
+
+        :param visible_sheep: Array of positions of visible sheep.
+        :param source: The position from which the perspective is taken (e.g., sheepdog or destination).
+        :return: Tuple of positions (leftmost_sheep, rightmost_sheep).
+        """
         if len(visible_sheep) == 0:
             return None, None
+
+        # Compute relative positions and angles from the source
         relative_positions = visible_sheep - source
-        angles = np.array([np.arctan2(pos[1], pos[0]) for pos in relative_positions])
+        angles = np.arctan2(relative_positions[:, 1], relative_positions[:, 0])  # Calculate angles
 
-        rightmost_sheep = self.p[np.argmin(angles)]  # Position of rightmost sheep
-        leftmost_sheep = self.p[np.argmax(angles)]  # Position of leftmost sheep
-
-        # TODO idk if there is a maximum angle or does the dog have 360 deg vision?
+        # Return the positions of the leftmost and rightmost sheep
+        leftmost_sheep = visible_sheep[np.argmax(angles)]
+        rightmost_sheep = visible_sheep[np.argmin(angles)]
 
         return leftmost_sheep, rightmost_sheep
 
@@ -280,23 +286,6 @@ class Simulation:
         distances = np.linalg.norm(self.p - self.p_d, axis=1)
         return np.all(distances <= self.rho_d)
 
-def rotation_matrix(theta):
-    """
-    Returns the 2D rotation matrix for a given angle theta.
-
-    Parameters:
-        theta (float): The angle in radians to rotate by.
-
-    Returns:
-        np.array: A 2x2 rotation matrix.
-    """
-    return np.array([
-        [np.cos(theta), -np.sin(theta)],
-        [np.sin(theta), np.cos(theta)]
-    ])
-
-def cosine_sim(a, b):
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 def animate_simulation(sim, max_steps=100, interval=100):
     """
@@ -372,4 +361,4 @@ if __name__ == "__main__":
     # simulation = Simulation(easy_dog_position, easy_sheep_positions,  easy_destination)
     simulation = Simulation(paper_dog_position, paper_sheep_positions,  paper_destination)
 
-    animate_simulation(simulation, max_steps=50000)
+    animate_simulation(simulation, max_steps=50000, interval=10)
