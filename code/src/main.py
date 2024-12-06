@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -45,26 +47,14 @@ class Simulation:
         self.lambda_k = 1
 
 
-    def run_simulation(self, max_steps=1000):
-        """
-        Run the simulation for a given number of steps or until convergence.
-        In the paper algo it is everything until line 6
-        """
-        positions = []
-        for step in range(max_steps):
-            positions.append(self.run_step())
-            if self.is_converged():
-                print(f"Simulation converged in {step + 1} steps.")
-                return positions
-        else:
-            print("Simulation did not converge.")
-        return positions
-
     def run_step(self):
         """
         Perform one step of the simulation.
         In the paper algorithm this is line 6
         """
+        if self.is_converged():
+            print(f"Simulation converged in {self.k + 1} steps.")
+            return self.q, self.p
 
         p_qi = self.p - self.q
         p_di = self.p - self.p_d
@@ -357,7 +347,6 @@ def animate_simulation(sim, max_steps=100, interval=100):
 
         # Update the step text
         step_text.set_text(f'Step: {frame}')
-
         return sheep_scatter, dog_marker
 
     # Create the animation
