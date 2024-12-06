@@ -13,7 +13,7 @@ def side_area(x, points, theta_min=0, theta_max=np.pi):
     """
 
     # Normalize the reference vector
-    o_x = normalize(x)
+    o_x = o(x)
 
     # Compute angles of all points relative to the reference vector
     angles = []
