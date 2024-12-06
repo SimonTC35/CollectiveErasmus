@@ -1,12 +1,8 @@
-import time
-
-import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 from scipy.spatial import ConvexHull
 
 from math_functions import *
-
 
 class Simulation:
     def __init__(self, q, p, p_d):
@@ -48,7 +44,6 @@ class Simulation:
 
         self.lambda_k = 1
 
-
     def run_step(self):
         """
         Perform one step of the simulation.
@@ -60,7 +55,6 @@ class Simulation:
 
         p_qi = self.p - self.q
         p_di = self.p - self.p_d
-
         V = self.visible_sheep() # all shepp visible from the dogs POV
         # herd_center = self.herd_center(V) # herd center of the visible sheep
 
@@ -70,8 +64,8 @@ class Simulation:
         D_cd = (self.p_d - self.p) / np.linalg.norm(self.p_d - self.p)
         D_qd = (self.p_d - self.q) / np.linalg.norm(self.p_d - self.q)
 
-        D_l, D_r = self.left_most_right_most_sheep(V, self.q) # left most and right most sheep from the dogs POV
-        C_l, C_r = self.left_most_right_most_sheep(V, self.p_d) # left most and right most sheep from the destinations POV
+        D_l, D_r = left_most_right_most_sheep(V, self.q) # left most and right most sheep from the dogs POV
+        C_l, C_r = left_most_right_most_sheep(V, self.p_d) # left most and right most sheep from the destinations POV
 
         if D_l is None:
             D_l = self.q
@@ -87,24 +81,28 @@ class Simulation:
         L_c = cosine_sim(D_cd, self.q-C_r)
         R_c = cosine_sim(D_cd, self.q-C_l)
 
-        u_k = 0
         if Q_l != [] and np.allclose(Q_l, self.q) and L_c > self.theta_t:
             self.lambda_k = 0
             if np.linalg.norm(self.q - D_r) >= self.r_a:
-                u_k = self.gamma_a*((- self.q + D_r) / np.linalg.norm(- self.q + D_r))
+                u_k = self.gamma_a*o(self.q-D_r)
             else:
-                u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_r), ((- self.q + D_r) / np.linalg.norm(- self.q + D_r)))
-        elif Q_r != [] and (np.allclose(Q_r, self.q) and R_c > self.theta_t) or self.lambda_k == 1:
+                u_k = self.gamma_b * rotation_matrix(self.theta_r) * o(self.q-D_r)
+        elif Q_r != [] and (np.allclose(Q_r, self.q) and R_c > self.theta_t):
             self.lambda_k = 1
             if np.linalg.norm(self.q - D_l) >= self.r_a:
-                u_k = self.gamma_a*((-self.q + D_l) / np.linalg.norm(- self.q + D_l))
+                u_k = self.gamma_a*o(self.q-D_l)
             else:
-                u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_l), ((-self.q + D_l) / np.linalg.norm(- self.q + D_l)))
+                u_k = self.gamma_b * rotation_matrix(self.theta_l) * o(self.q-D_l)
+        elif self.lambda_k == 1:
+            if np.linalg.norm(self.q - D_l) >= self.r_a:
+                u_k = self.gamma_a*o(self.q-D_l)
+            else:
+                u_k = self.gamma_b * rotation_matrix(self.theta_l) * o(self.q-D_l)
         else:
-            if np.linalg.norm(self.q - D_r) >= self.r_a:
-                u_k = self.gamma_a*((- self.q + D_r) / np.linalg.norm(- self.q + D_r))
+            if np.linalg.norm(D_r - self.q) >= self.r_a:
+                u_k = self.gamma_a * o(self.q - D_r)
             else:
-                u_k = self.gamma_b * np.dot(rotation_matrix(self.theta_r), ((- self.q + D_r) / np.linalg.norm(- self.q + D_r)))
+                u_k = self.gamma_b * rotation_matrix(self.theta_r) * o(self.q-D_r)
 
         # update dog position
         self.q = self.q + self.T * u_k
@@ -112,11 +110,7 @@ class Simulation:
         # update sheep positions
         velocities = []
         for sheep_index in range(self.N):
-            norm_p_qi = np.linalg.norm(p_qi[sheep_index])
-            if norm_p_qi > 1e-8:
-                v_di = self.phi(norm_p_qi) * (p_qi[sheep_index] / norm_p_qi)
-            else:
-                v_di = np.zeros_like(p_qi[sheep_index])
+            v_di = self.phi(np.linalg.norm(p_qi[sheep_index])) * o(p_qi[sheep_index])
             v_si = self.compute_sheep_velocity(sheep_index)
             v_i = v_di + np.dot(rotation_matrix(self.theta), v_si)
             velocities.append(v_i)
@@ -137,21 +131,7 @@ class Simulation:
         
         for j in range(self.N):
             if i != j:
-                # Compute the distance between sheep i and sheep j
-                distance = np.linalg.norm(self.p[i] - self.p[j])
-                
-                # Compute the repulsive force using psi(x)
-                repulsive_force = self.psi(distance)
-                
-                # Compute the direction from sheep i to sheep j
-                direction = self.p[i] - self.p[j]
-                if np.linalg.norm(direction) > 1e-8:  # Use a small epsilon to avoid numerical errors
-                    unit_direction = direction / np.linalg.norm(direction)
-                else:
-                    unit_direction = np.zeros_like(direction)  # Assign a zero vector
-                
-                # Add the force to the velocity
-                v_si += repulsive_force * unit_direction
+                v_si += self.psi(np.linalg.norm(self.p[i] - self.p[j])) * o(self.p[i] - self.p[j])
                 
         return v_si
 
@@ -162,10 +142,6 @@ class Simulation:
         :param x: The distance between two sheep.
         :return: The magnitude of the velocity vector due to other sheep.
         """
-        if x <= self.rho_s:
-            # Strong repulsion for safety zone
-            return self.beta * (1 / (x + 1e-8) - 1 / self.rho_s)
-            # return 0
         if self.rho_s < x <= self.rho_r:
             # Mild repulsion in the repulsion zone
             return self.beta * (1 / (x - self.rho_s) - 1 / (self.rho_r - self.rho_s))
@@ -186,10 +162,8 @@ class Simulation:
         :param x: The distance between the sheep and the sheepdog.
         :return: The magnitude of the velocity vector due to the sheepdog.
         """
-        if x <= 0:
-            return 0  # Prevent invalid behavior for non-positive distances
         if 0 < x <= self.rho_n:
-            return self.alpha * (1 / x - 1 / self.rho_n)
+            return self.alpha * ((1 / x) - (1 / self.rho_n))
         else:
             return 0
 
@@ -238,46 +212,8 @@ class Simulation:
                 angle_visibility[angle] = distance
                 if distance <= self.rho_v:
                     visible_indices.append(int(index))
+
         return self.p[visible_indices]
-
-    def herd_center(self, visible_indices):
-        """
-        Compute the center of the visible herd.
-        """
-        if len(visible_indices) > 0:
-            visible_positions = self.p[visible_indices]
-            center = np.mean(visible_positions, axis=0)
-        else:
-            center = None
-        return center
-
-    def left_most_right_most_sheep(self, visible_sheep, source):
-        """
-        Identify the leftmost and rightmost visible sheep from the perspective of the source.
-
-        :param visible_sheep: Array of positions of visible sheep.
-        :param source: The position from which the perspective is taken (e.g., sheepdog or destination).
-        :return: Tuple of positions (leftmost_sheep, rightmost_sheep).
-        """
-        if len(visible_sheep) == 0:
-            return None, None
-
-        # Compute relative positions and angles from the source
-        relative_positions = visible_sheep - source
-        angles = np.arctan2(relative_positions[:, 1], relative_positions[:, 0])  # Calculate angles
-
-        # Return the positions of the leftmost and rightmost sheep
-        leftmost_sheep = visible_sheep[np.argmax(angles)]
-        rightmost_sheep = visible_sheep[np.argmin(angles)]
-
-        return leftmost_sheep, rightmost_sheep
-
-    def sheep_herd_polygon(self):
-        """
-        Compute the convex hull of the sheep herd.
-        """
-        hull = ConvexHull(self.p)
-        return self.p[hull.vertices]
 
     def is_converged(self):
         """

@@ -74,3 +74,24 @@ def C(P):
     :return:
     '''
     len(set(P))
+
+def left_most_right_most_sheep(visible_sheep, source):
+    """
+    Identify the leftmost and rightmost visible sheep from the perspective of the source.
+
+    :param visible_sheep: Array of positions of visible sheep.
+    :param source: The position from which the perspective is taken (e.g., sheepdog or destination).
+    :return: Tuple of positions (leftmost_sheep, rightmost_sheep).
+    """
+    if len(visible_sheep) == 0:
+        return None, None
+
+    # Compute relative positions and angles from the source
+    relative_positions = visible_sheep - source
+    angles = np.arctan2(relative_positions[:, 1], relative_positions[:, 0])  # Calculate angles
+
+    # Return the positions of the leftmost and rightmost sheep
+    leftmost_sheep = visible_sheep[np.argmax(angles)]
+    rightmost_sheep = visible_sheep[np.argmin(angles)]
+
+    return leftmost_sheep, rightmost_sheep
