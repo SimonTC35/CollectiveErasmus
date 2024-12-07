@@ -44,7 +44,7 @@
 % \significancestatement{Procedural generation of a tropic island and \\coral reef}{In computer graphics there is frequent need for displaying large vistas of natural looking terrain. Designing such terrain by hand is typically time consuming. With procedural generation, on the other hand, larger areas of natural looking terrain can be generated with or without minimal intervention in a relatively short time. In this work we present a process of procedural generation of a tropical island with the associated corral reef. We start by generating a heightmap for the base terrain. The heightmap is then transformed by simulating the processes of hydraulic and thermal erosion to achieve a more natural look of the terrain. As coral reefs often grow around tropical islands, we also simulate their growth as part of the last step. Real-time visualization is enabled during the simulation, so that one can observe the evolution of the terrain. Here we dynamically apply textures to the terrain based on its local characteristics. The result is a natural looking model of the textured tropical island and corral reef.}{Procedural generation | Terrain generation | Thermal and hydraulic erosion | Coral reef | Simulation | GPU}
 
 \selectlanguage{slovene}
-
+\usepackage{verbatim}
 % Please include corresponding author, author contribution and author declaration information
 %\authorcontributions{Please provide details of author contributions here.}
 %\authordeclaration{Please declare any conflict of interest here.}
@@ -55,7 +55,7 @@
 \keywords{Sheepdog-Driven algorithm | Swarm systems | Controlling agent} 
 
 \begin{abstract}
-TODO ABSTRACT
+The project explores the sheepdog-driven algorithm for sheep herd transport, demonstrating how a single agent can control and guide a swarm from one location to another through simple local interactions. The objective is to replicate the algorithm and evaluate its effectiveness in simulating dynamic control, where the sheepdog influences the herd's movement using basic rules. The backward semi-circle reciprocation algorithm will be implemented, incorporating behaviors observed in real sheepdogs, such as circular path movement and decision-making based on the sheep's positions. The effectiveness of the algorithm in achieving coordinated herd transport will be assessed under varying conditions, including changes in herd size, obstacle placement, and sheepdog responsiveness. Ultimately, the goal is to enhance the algorithm’s adaptability and explore its broader potential.
 \end{abstract}
 
 \dates{\textbf{\today}}
@@ -76,13 +76,10 @@ TODO ABSTRACT
 
 % If your first paragraph (i.e. with the \dropcap) contains a list environment (quote, quotation, theorem, definition, enumerate, itemize...), the line after the list may have some extra indentation. If this is the case, add \parshape=0 to the end of the list environment.
 
-\dropcap{T}his project explores the Sheepdog-Driven Algorithm for Sheep Herd Transport by Liu et al., 2021 \cite{liu2021}. The study moves beyond traditional swarm systems, where collective behavior emerges naturally within a group, to address a reverse problem: how a single agent (a "sheepdog") can control and direct a swarm (a "herd of sheep") from one location to another. The objective is to replicate and evaluate this sheepdog-inspired approach, focusing on how a single controlling agent can dynamically influence the herd to accomplish transport tasks.
+\dropcap{A}nimal behavior-inspired algorithms enable efficient, adaptive solutions to complex problems by mimicking the coordinated actions of animals, swarm behaviours, such as flocking or schooling. This project explores the Sheepdog-Driven Algorithm for Sheep Herd Transport by Liu et al., 2021 \cite{liu2021}, that moves beyond traditional swarm systems, where collective behavior emerges naturally within a group, to address a reverse problem: how a single agent (a "sheepdog") can control and direct a swarm (a "herd of sheep") from one location to another.
+ The objective is to replicate and evaluate this sheepdog-inspired approach, focusing on how a single controlling agent can dynamically influence the herd to accomplish transport tasks.
 
-The initial phase of this project involves implementing the algorithm described in the paper using Python. Through this implementation, we will conduct tests and fine-tune parameters to evaluate the effectiveness and adaptability of the model as outlined in the study. In subsequent phases, we will introduce several extensions, including the addition of environmental obstacles, the presence of outlier sheep, and variations in the characteristics of the controlling agent.
-
-To effectively present our findings, we will generate visual representations using Unity. The Python-based algorithm will compute the movement paths for each sheep and the sheepdog, which will then be visualized. These visualizations will be produced post-simulation rather than in real time.
-
-Our results will be analyzed in the context of related studies, and we will conclude with a summary of our findings, including any insights gained from the extensions introduced.
+After implementing the base algorithm, our team will experiment with its parameters and performance under different conditions. This will include testing variations like obstacle placement, changes in herd size, or adjustments to sheepdog responsiveness. As we analyze the algorithm’s effectiveness in guiding the sheep herd, we may consider developing new behaviors or optimizations to enhance adaptability, with the potential for further applications in fields like autonomous drone or robot control.
 
 % \dropcap{D}iplomsko delo prikazuje metode za proceduralno generiranje tropskega otoka, primernega za uporabo v računalniški igri. Omejimo se na generiranje in teksturiranje terena, brez postavljanja morebitnih ostalih objektov, kot so drevesa in skale. Ker je v primeru večjih terenov proceduralno generiranje mnogokrat računsko intenzivna operacija, posamezne korake implementiramo na grafični procesni enoti (GPE), ki je zaradi njene visoko paralelne arhitekture zmožna hitrega procesiranja velike količine podatkov. Najprej generiramo začetni teren, nato pa za bolj verodostojen videz simuliramo hidravlično in termično erozijo. Ker v tropskih morjih v okolici otokov običajno rastejo koralni grebeni, izvedemo tudi simulacijo rasti le-teh. Na teren lepimo teksture ustrezne njegovim značilnostim. 
 
@@ -94,35 +91,20 @@ Our results will be analyzed in the context of related studies, and we will conc
 
 \section*{Related Work}
 
-In recent years, numerous studies have advanced the understanding of collective behavior and herding control among autonomous agents. A foundational contribution by Reynolds (1987) \cite{reynols1987} introduced the "boids" model, which used local rules to simulate natural group dynamics such as flocking and schooling. This work laid the groundwork for many modern algorithms in swarm robotics and serves as an essential reference for simulating decentralized animal behaviors. 
+In recent years, numerous studies have advanced the understanding of collective behavior and herding control among autonomous agents. A foundational contribution by Reynolds (1987) \cite{reynols1987} introduced the "boids" model, which used local rules to simulate natural group dynamics such as flocking and schooling. This work laid the groundwork for many modern algorithms in swarm robotics and serves as an essential reference for simulating decentralized animal behaviors.  They suggested that future work could involve adding more realistic individual behaviors, such as hunger or fear, and integrating detailed animations like wing flapping with motion dynamics. These enhancements could make simulations more lifelike and versatile.
 
-Building on this, Strömbom et al. (2014) \cite{Strmbom2014SolvingTS} addressed the specific "shepherding problem," proposing heuristic methods for guiding groups of autonomous agents using a single "shepherd" agent—a framework that highlights key challenges and strategies relevant to single-agent control in herding tasks. 
+
+Building on this, Strömbom et al. (2014) \cite{Strmbom2014SolvingTS} addressed the specific "shepherding problem," proposing heuristic methods for guiding groups of autonomous agents using a single "shepherd" agent—a framework that highlights key challenges and strategies relevant to single-agent control in herding tasks. Their approach emphasizes adaptive switching between collecting agents that are dispersed and driving the group when it is cohesive, a behavior closely resembling real-world herding events involving sheep and sheepdogs. Notably, their algorithm also highlights the importance of visual feedback, such as estimating spacing between agents, to maintain group cohesion and movement toward a target. This method demonstrates broader applicability, from robot-assisted herding and crowd control to tasks like environmental cleanup, making it a versatile solution for various collective behavior scenarios.
 % Similarly, Lien and Pratt (2009) explored interactive herding methods, demonstrating techniques for a single agent to dynamically direct a group while maintaining cohesion and navigating obstacles. Their work provides valuable insights for real-time control applications in both simulation and robotics. 
 
-Further, Bayazit, Lien, and Amato (2002) \cite{bayazit2002} proposed a global roadmap approach for managing group behavior in complex, obstacle-rich environments, underscoring strategies for effective navigation in challenging terrains. 
+
+Furthermore, Bayazit, Lien, and Amato (2002) \cite{bayazit2002} proposed a global roadmap approach for managing group behavior in complex, obstacle-rich environments, underscoring strategies for effective navigation in challenging terrains. They demonstrated how embedding behavior rules into roadmaps and individual agents enables dynamic decision-making based on location and state. This approach mirrors the Sheepdog-Driven Algorithm, where the sheepdog dynamically adjusts its behavior based on the herd’s position and proximity to obstacles. Both frameworks rely on balancing local interactions with global guidance, ensuring that individual agents respond adaptively while maintaining overall group cohesion. The roadmap's ability to represent environmental constraints and influence movement aligns with the algorithm's goal of efficiently directing herds in diverse and complex scenarios.
 
 Together, these studies form a comprehensive base for understanding swarm and herding behaviors, which informs the development of adaptive and efficient algorithms, such as the Sheepdog-Driven Algorithm, and supports a comparative analysis of its performance across various environments and control requirements.
 
-\section*{The Algorithm}
-The algorithm defines the sheepdog’s movement as a backward semi-circular trajectory, allowing it to drive the sheep herd from behind \cite{liu2021}. The sheepdog operates within a two-dimensional plane, using an xx-yy coordinate system to track both its own location and that of each sheep. The sheepdog aims to guide the herd toward a designated target area by pushing them forward in a controlled manner.
 
-Key aspects of the algorithm include the sheepdog's field of view, which restricts its awareness to only those sheep within its line of sight. Consequently, the sheepdog's response is dynamically adjusted based on the position and behavior of visible sheep, meaning it does not always have complete information about the entire herd.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=.6\linewidth]{fig/vision-field.png}
-	\caption{Example of dog's field of view.\cite{liu2021}}
-	\label{fig:vision-field}
-\end{figure}
-
-The control process of the sheepdog is divided into two phases:
-\begin{enumerate}
-    \item Initialization: This phase involves setting key design parameters such as viewing angles, approach distances, and thresholds for direction adjustments. A time limit is also set for the operation.
-    \item Iteration: In the main phase, the algorithm evaluates the position of the sheep relative to the target and adjusts the sheepdog's movement accordingly. The sheepdog decides whether to move directly toward the herd or to take a detour based on the herd's overall position. When detouring, it aligns itself with the rightmost or leftmost visible sheep, adjusting its angle to efficiently steer the herd without unnecessary deviation from the target path.
-\end{enumerate}
-
-The algorithm operates through a series of conditions to ensure energy efficiency and maintain herd cohesion, continuing until all sheep are guided to the target area or the time limit is reached.
-
+\begin{comment}
 \begin{algorithm}[H]
 \caption{Sheepdog Driven Algorithm \cite{liu2021}}
 \label{alg:sheepdog}
@@ -169,15 +151,39 @@ The algorithm operates through a series of conditions to ensure energy efficienc
 \State \textbf{return} result
 \end{algorithmic}
 \end{algorithm}
-
+\end{comment}
 
 \section*{Methodology}
 
-The practical component of this project is divided into two primary tasks: implementing the simulation algorithm in Python and developing a visualization system in Unity using C++. The methodology section outlines the approach taken to develop these components, along with the processes for testing, refining, and analyzing results.
+The practical component of this project is divided into two primary tasks: implementing the simulation algorithm in Python and developing a visualization system in Unity. The methodology section outlines the approach taken to develop these components, along with the processes for testing, refining, and analyzing results.
 
-\subsection*{Simmulation}
+\subsection*{The Algorithm}
+The algorithm defines the sheepdog’s movement as a backward semi-circular trajectory, allowing it to drive the sheep herd from behind \cite{liu2021}. The sheepdog operates within a two-dimensional plane, using an xx-yy coordinate system to track both its own location and that of each sheep. The sheepdog aims to guide the herd toward a designated target area by pushing them forward in a controlled manner.
 
-In the simulation phase, the Sheepdog-Driven Algorithm, will be implemented in Python to replicate the sheepdog-herd dynamics on a two-dimensional plane. The simulation aims to model the movements and interactions of both the sheepdog and the sheep, capturing the complex behaviors that arise as the sheepdog attempts to guide the herd to a target location. In the original paper, this was done with MATLAB.
+Key aspects of the algorithm include the sheepdog's field of view, which restricts its awareness to only those sheep within its line of sight. Consequently, the sheepdog's response is dynamically adjusted based on the position and behavior of visible sheep, meaning it does not always have complete information about the entire herd.
+
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.6\linewidth]{fig/vision-field.png}
+	\caption{Example of dog's field of view.\cite{liu2021}}
+	\label{fig:vision-field}
+\end{figure}
+
+The control process of the sheepdog is divided into two phases:
+\begin{enumerate}
+    \item Initialization: This phase involves setting key design parameters such as viewing angles, approach distances, and thresholds for direction adjustments. A time limit is also set for the operation.
+    \item Iteration: In the main phase, the algorithm evaluates the position of the sheep relative to the target and adjusts the sheepdog's movement accordingly. The sheepdog decides whether to move directly toward the herd or to take a detour based on the herd's overall position. When detouring, it aligns itself with the rightmost or leftmost visible sheep, adjusting its angle to efficiently steer the herd without unnecessary deviation from the target path.
+\end{enumerate}
+
+The algorithm operates through a series of conditions to ensure energy efficiency and maintain herd cohesion, continuing until all sheep are guided to the target area or the time limit is reached.
+
+The algorithm itself serves as the foundation for the Simulation phase, where its implementation will be tested and refined in a Python-based environment. Following the algorithm's execution, its performance will be evaluated in simulated conditions, with particular attention to the adaptability and effectiveness of the sheepdog’s control in various test scenarios.
+
+\subsection*{Simulation}
+
+In the simulation phase, the Sheepdog-Driven Algorithm will be implemented in Python to replicate the sheepdog-herd dynamics on a two-dimensional plane. The simulation aims to model the movements and interactions of both the sheepdog and the sheep, capturing the complex behaviors that arise as the sheepdog attempts to guide the herd to a target location. In the original paper, this was done with MATLAB.
 
 \begin{enumerate}
     \item Algorithm Implementation: The algorithm will be programmed to include the sheepdog’s backward semi-circular motion, a key mechanism for maintaining control over the herd. This involves defining functions that represent the sheepdog’s movements, perception field, and the reactive behaviors of individual sheep.
@@ -192,8 +198,8 @@ In the simulation phase, the Sheepdog-Driven Algorithm, will be implemented in P
 \end{enumerate}
 
 \subsection*{Visualisation}
-
-The visualization component of this project is developed in Unity using C\# (or even Python) to render the movement data generated from the Python simulation, providing an interactive and comprehensible format for analyzing the algorithm's behavior. This allows for a detailed observation of how effectively the sheepdog can guide the herd under various conditions. The visualization process begins with importing path data from the Python simulation into Unity or rewriting the Python code to C# to produce the data directly in Unity (in real time). This data represents each agent's movements, enabling us to create animated paths that reflect the interactions between the sheepdog and sheep over time.
+The visualization component of this project will be developed in Unity to render the movement data generated from the Python simulation, providing an interactive and comprehensible format for analyzing the algorithm's behavior. This allows for a detailed observation of how effectively the sheepdog can guide the herd under various conditions. The visualization process begins with importing path data from the Python simulation into Unity %or rewriting the Python code to C# to produce the data directly in Unity (in real time)
+. This data represents each agent's movements, enabling us to create animated paths that reflect the interactions between the sheepdog and sheep over time.
 
 A virtual environment is then constructed in Unity to provide a realistic setting for the simulation. This environment includes basic elements such as ground planes, obstacles, and boundaries, mirroring the conditions modeled in the Python simulation to enhance visual coherence and aid in understanding how environmental factors affect the sheepdog’s control over the herd. 
 
@@ -201,13 +207,25 @@ Unity’s visualization setup focuses on representing the dynamic interactions b
 
 As the visualization is not rendered in real time, the animation will be recorded and played back in segments. This approach enables static analysis, where we can pause and closely examine specific interactions or adaptations within the algorithm. By allowing for playback and frame-by-frame inspection, the Unity-based visualization provides a valuable tool for evaluating the algorithm’s effectiveness, adaptability, and overall performance in guiding the herd through diverse scenarios.
 
-\section*{Results and Discussion}
+\section*{Results}
 
-After running multiple visualizations and tests, we are able to evaluate the findings from the initial paper. This evaluation is done by comparing the changes we made to the algorithm and setup with the cases reproduced from the paper.
 
-We then place our project in the larger context of collective behavior. We discuss how our findings might impact research in this area and contribute to real-world applications.
+So far, we have implemented a simulation based on the sheepdog-driven algorithm for herd transport. The code models the interaction between the sheepdog and the sheep, with the dog guiding the herd towards a destination using local interaction rules. We have defined the movement dynamics for both the sheep and the sheepdog, including attraction, repulsion, and visibility checks. The simulation updates the positions of the agents in real-time. 
 
-We conclude the paper by providing an outlook on the future. What are the next steps? How could our findings be applied outside the lab? Do we now have the ideal sheepdog? Are there any further improvements or new directions we should explore?
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.6\linewidth]{fig/step17.PNG}
+	\caption{The starting phase of herding}
+	\label{fig:start}
+\end{figure}
+
+Further refinement of the algorithm is underway to improve the movement and the mutual coordination.
+
+\section*{Discussion}
+After fully replicating the algorithm, the focus will shift to experimenting with different parameters to optimize its performance and achieve improved results. This includes exploring variations in herd size, sheepdog responsiveness, and environmental factors such as obstacle placement. Insights gained from these experiments will guide potential modifications or extensions to the algorithm, aiming to enhance its adaptability and effectiveness in diverse scenarios.
+
+\section*{Contributions}
+SH and IB did the implementation, II did the report, LP was helping with both.
 
 \begin{multicols}{2}
 \section*{\bibname}
