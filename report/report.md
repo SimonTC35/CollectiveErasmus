@@ -72,7 +72,13 @@ The scene includes a Manager which creates all the entities dynamically based on
 ![alt text](inspector.png "Inspector of Manager")
 *Inspector of Manager*
 ## Environment
-Since our simulation does not support hills or other uneven terrain, we need to stuck to a flat terrain. However we tried to make it as beautiful as possible with some textures and the Painting-Details build in feature of Unity. For gras and textures, we took https://assetstore.unity.com/packages/2d/textures-materials/nature/grass-flowers-pack-free-138810. In addition to this we wanted to have something more special and we decided to include a Skybox as background which shows the FRI of Ljubljana. The photo was taken from FRI website https://www.fri.uni-lj.si/sl/virtualni-sprehod / Google Maps and then wrapped to get a 360° skybox.
+Since our simulation does not support hills or other uneven terrain, we need to stuck to a flat terrain. However we tried to make it as beautiful as possible with some textures and the Painting-Details build in feature of Unity. For gras and textures, we took https://assetstore.unity.com/packages/2d/textures-materials/nature/grass-flowers-pack-free-138810. In addition to this we wanted to have something more special and we decided to include a Skybox as background which shows the FRI of Ljubljana.
+First we tried to do it with a panorama-photo which was taken by ourselves, but the result did not look as good as we were hoping for.
+Funny enough, a dog in real life joined us randomly during this procedure.
+![alt text](background.png "Background")
+*Us trying to use a selfmade panorama as background for Unity*
+
+In the end we used a 360° photo from the FRI website https://www.fri.uni-lj.si/sl/virtualni-sprehod / Google Maps and then wrapped it to create a 360° skybox. This method gave us quite well looking results:
 
 ![alt text](dog_per.png "Environment from Dog Perspective")
 *Environment from Dog Perspective*
