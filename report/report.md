@@ -76,7 +76,7 @@ Since our simulation does not support hills or other uneven terrain, we need to 
 First we tried to do it with a panorama-photo which was taken by ourselves, but the result did not look as good as we were hoping for.
 Funny enough, a dog in real life joined us randomly during this procedure.
 ![alt text](background.png "Background")
-*Us trying to use a selfmade panorama as background for Unity*
+*Us trying to take and use a selfmade panorama as background in Unity*
 
 In the end we used a 360° photo from the FRI website https://www.fri.uni-lj.si/sl/virtualni-sprehod / Google Maps and then wrapped it to create a 360° skybox. This method gave us quite well looking results:
 
