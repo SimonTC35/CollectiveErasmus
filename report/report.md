@@ -72,7 +72,7 @@ The scene includes a Manager which creates all the entities dynamically based on
 ![alt text](inspector.png "Inspector of Manager")
 *Inspector of Manager*
 ## Environment
-Since our simulation does not support hills or other uneven terrain, we need to stuck to a flat terrain. However we tried to make it as beautiful as possible with some textures and the Painting-Details build in feature of Unity. For gras and textures, we took https://assetstore.unity.com/packages/2d/textures-materials/nature/grass-flowers-pack-free-138810. In addition to this we wanted to have something more special and we decided to include a Skybox as background which shows the FRI of Ljubljana. The photo was taken from FRI website https://www.fri.uni-lj.si/sl/virtualni-sprehod/ Google Maps and then wrapped to get a 360° skybox.
+Since our simulation does not support hills or other uneven terrain, we need to stuck to a flat terrain. However we tried to make it as beautiful as possible with some textures and the Painting-Details build in feature of Unity. For gras and textures, we took https://assetstore.unity.com/packages/2d/textures-materials/nature/grass-flowers-pack-free-138810. In addition to this we wanted to have something more special and we decided to include a Skybox as background which shows the FRI of Ljubljana. The photo was taken from FRI website https://www.fri.uni-lj.si/sl/virtualni-sprehod / Google Maps and then wrapped to get a 360° skybox.
 
 ![alt text](dog_per.png "Environment from Dog Perspective")
 *Environment from Dog Perspective*
