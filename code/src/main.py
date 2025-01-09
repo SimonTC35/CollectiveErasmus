@@ -44,6 +44,22 @@ class Simulation:
 
         self.lambda_k = 1
 
+        self.data = {}
+
+    def extract_json(self):
+        for j, s in enumerate(self.p):  #
+            try:
+                self.data["sheep" + str(j + 1)].append([s[0].tolist(), s[1].tolist()])
+            except:
+                self.data["sheep" + str(j + 1)] = []
+                self.data["sheep" + str(j + 1)].append([s[0].tolist(), s[1].tolist()])
+
+        try:
+            self.data["dog" + str(1)].append([self.q[0].tolist(), self.q[1].tolist()])
+        except:
+            self.data["dog" + str(1)] = []
+            self.data["dog" + str(1)].append([self.q[0].tolist(), self.q[1].tolist()])
+
     def run_step(self):
         """
         Perform one step of the simulation.
@@ -121,6 +137,7 @@ class Simulation:
 
         # update dog position
         self.q = self.q + self.T * u_k
+        #self.extract_json()
 
         # update sheep positions
         velocities = []
@@ -281,6 +298,35 @@ def animate_simulation(sim, max_steps=100, interval=100):
     step_text = ax.text(0.05, 0.95, '', transform=ax.transAxes, fontsize=12,
                         verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
 
+    def write_json(simulation):
+        coords = simulation.data["dog1"]
+        current_entity = {"x": [], "y": []}
+        for c in coords:
+            current_entity["x"].append(c[0])
+            current_entity["y"].append(c[1])
+        json_object = json.dumps(current_entity, indent=2)
+
+            # Writing to sample.json
+        with open("PATH_TO_UNITY_PROJECT/Assets/jsons/dog1" + ".json", "w") as outfile:
+          outfile.write(json_object)
+
+        i = 1
+        while True:
+            name = "sheep" + str(i)
+            if name not in simulation.data:
+                break
+            coords = simulation.data[name]
+            current_entity = {"x": [], "y": []}
+            for c in coords:
+                current_entity["x"].append(c[0])
+                current_entity["y"].append(c[1])
+            json_object = json.dumps(current_entity, indent=2)
+
+                # Writing to sample.json
+            with open("PATH_TO_UNITY_PROJECT/Assets/jsons/" + name + ".json", "w") as outfile:
+                outfile.write(json_object)
+            i += 1
+
     def update(frame):
         # Run a simulation step
         sim.run_step()
@@ -319,3 +365,5 @@ if __name__ == "__main__":
     simulation = Simulation(paper_dog_position, paper_sheep_positions,  paper_destination)
 
     animate_simulation(simulation, max_steps=50000, interval=1)
+
+    #write_json(simulation)
