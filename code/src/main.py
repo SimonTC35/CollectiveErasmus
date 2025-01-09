@@ -3,7 +3,7 @@ from matplotlib.animation import FuncAnimation
 from scipy.spatial import ConvexHull
 
 from math_functions import *
-
+import json
 class Simulation:
     def __init__(self, q, p, p_d):
         # Constants and initial positions
@@ -44,6 +44,8 @@ class Simulation:
 
         self.lambda_k = 1
 
+        self.EXTRACT_COORDS = False
+        self.PATH_TO_UNITY_PROJECT = "/home/student/Desktop"
         self.data = {}
 
     def extract_json(self):
@@ -59,6 +61,35 @@ class Simulation:
         except:
             self.data["dog" + str(1)] = []
             self.data["dog" + str(1)].append([self.q[0].tolist(), self.q[1].tolist()])
+
+    def write_json(self):
+        coords = self.data["dog1"]
+        current_entity = {"x": [], "y": []}
+        for c in coords:
+            current_entity["x"].append(c[0])
+            current_entity["y"].append(c[1])
+        json_object = json.dumps(current_entity, indent=2)
+
+        # Writing to sample.json
+        with open(self.PATH_TO_UNITY_PROJECT+"/Assets/jsons/dog1" + ".json", "w") as outfile:
+          outfile.write(json_object)
+
+        i = 1
+        while True:
+            name = "sheep" + str(i)
+            if name not in self.data:
+                break
+            coords = self.data[name]
+            current_entity = {"x": [], "y": []}
+            for c in coords:
+                current_entity["x"].append(c[0])
+                current_entity["y"].append(c[1])
+            json_object = json.dumps(current_entity, indent=2)
+
+            # Writing to sample.json
+            with open(self.PATH_TO_UNITY_PROJECT+"/Assets/jsons/" + name + ".json", "w") as outfile:
+                outfile.write(json_object)
+            i += 1
 
     def run_step(self):
         """
@@ -137,7 +168,9 @@ class Simulation:
 
         # update dog position
         self.q = self.q + self.T * u_k
-        #self.extract_json()
+        
+        if self.EXTRACT_COORDS:
+          self.extract_json()
 
         # update sheep positions
         velocities = []
@@ -156,6 +189,10 @@ class Simulation:
                     self.p[i] = self.p[i] + np.random.rand(1)
 
         self.k += 1
+
+        if self.EXTRACT_COORDS:
+          self.write_json()
+
         return self.q, self.p
     
     def compute_sheep_velocity(self, i):
@@ -297,35 +334,6 @@ def animate_simulation(sim, max_steps=100, interval=100):
 
     step_text = ax.text(0.05, 0.95, '', transform=ax.transAxes, fontsize=12,
                         verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
-
-    def write_json(simulation):
-        coords = simulation.data["dog1"]
-        current_entity = {"x": [], "y": []}
-        for c in coords:
-            current_entity["x"].append(c[0])
-            current_entity["y"].append(c[1])
-        json_object = json.dumps(current_entity, indent=2)
-
-            # Writing to sample.json
-        with open("PATH_TO_UNITY_PROJECT/Assets/jsons/dog1" + ".json", "w") as outfile:
-          outfile.write(json_object)
-
-        i = 1
-        while True:
-            name = "sheep" + str(i)
-            if name not in simulation.data:
-                break
-            coords = simulation.data[name]
-            current_entity = {"x": [], "y": []}
-            for c in coords:
-                current_entity["x"].append(c[0])
-                current_entity["y"].append(c[1])
-            json_object = json.dumps(current_entity, indent=2)
-
-                # Writing to sample.json
-            with open("PATH_TO_UNITY_PROJECT/Assets/jsons/" + name + ".json", "w") as outfile:
-                outfile.write(json_object)
-            i += 1
 
     def update(frame):
         # Run a simulation step
