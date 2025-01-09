@@ -47,6 +47,7 @@ class Simulation:
         self.lambda_k = 1
         self.json_data = {}
 
+        # MODIFY IF NEEDED
         self.EXTRACT_COORDS = False
         self.PATH_TO_UNITY_PROJECT = "PATH_TO_UNITY_PROJECT"
         
