@@ -3,7 +3,9 @@ from matplotlib.animation import FuncAnimation
 from scipy.spatial import ConvexHull
 
 from math_functions import *
+
 import json
+
 class Simulation:
     def __init__(self, q, p, p_d):
         # Constants and initial positions
@@ -43,27 +45,28 @@ class Simulation:
         self.theta_l = -np.pi / 4
 
         self.lambda_k = 1
+        self.json_data = {}
 
         self.EXTRACT_COORDS = False
-        self.PATH_TO_UNITY_PROJECT = "/home/student/Desktop"
-        self.data = {}
+        self.PATH_TO_UNITY_PROJECT = "PATH_TO_UNITY_PROJECT"
+        
 
     def extract_json(self):
         for j, s in enumerate(self.p):  #
             try:
-                self.data["sheep" + str(j + 1)].append([s[0].tolist(), s[1].tolist()])
+                self.json_data["sheep" + str(j + 1)].append([s[0].tolist(), s[1].tolist()])
             except:
-                self.data["sheep" + str(j + 1)] = []
-                self.data["sheep" + str(j + 1)].append([s[0].tolist(), s[1].tolist()])
+                self.json_data["sheep" + str(j + 1)] = []
+                self.json_data["sheep" + str(j + 1)].append([s[0].tolist(), s[1].tolist()])
 
         try:
-            self.data["dog" + str(1)].append([self.q[0].tolist(), self.q[1].tolist()])
+            self.json_data["dog" + str(1)].append([self.q[0].tolist(), self.q[1].tolist()])
         except:
-            self.data["dog" + str(1)] = []
-            self.data["dog" + str(1)].append([self.q[0].tolist(), self.q[1].tolist()])
+            self.json_data["dog" + str(1)] = []
+            self.json_data["dog" + str(1)].append([self.q[0].tolist(), self.q[1].tolist()])
 
     def write_json(self):
-        coords = self.data["dog1"]
+        coords = self.json_data["dog1"]
         current_entity = {"x": [], "y": []}
         for c in coords:
             current_entity["x"].append(c[0])
@@ -77,9 +80,9 @@ class Simulation:
         i = 1
         while True:
             name = "sheep" + str(i)
-            if name not in self.data:
+            if name not in self.json_data:
                 break
-            coords = self.data[name]
+            coords = self.json_data[name]
             current_entity = {"x": [], "y": []}
             for c in coords:
                 current_entity["x"].append(c[0])
