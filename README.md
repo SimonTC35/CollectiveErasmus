@@ -1,10 +1,6 @@
 # Sheepdog-Driven Algorithm for Sheep Herd Transport
 
-This project explores the **[Sheepdog-Driven Algorithm for Sheep Herd Transport by Liu et al., 2021](https://doi.org/10.23919/CCC52363.2021.9549396)**. The study moves beyond traditional swarm systems, where collective behavior emerges naturally within a group, to address a reverse problem: how a single agent (a "sheepdog") can control and direct a swarm (a "herd of sheep") from one location to another. The objective is to replicate and evaluate this sheepdog-inspired approach, focusing on how a single controlling agent can dynamically influence the herd to accomplish transport tasks.
-
-In this project, we will implement the **backward semi-circle reciprocation algorithm** described in the paper. This algorithm incorporates key behaviors observed in real sheepdogs, including reciprocal movement in a semicircular path and dynamic selection of turn-around points based on the sheep's positions. The "sheep" in this simulation will be individual agents programmed to follow simple, preset rules that govern flocking behavior. The sheepdog, on the other hand, will use these rules strategically to control the sheep’s overall movement toward a defined goal.
-
-After implementing the base algorithm, our team will experiment with its parameters and performance under different conditions. This might include testing variations like obstacle placement, changes in herd size, or adjustments to sheepdog responsiveness. As we analyze the algorithm’s effectiveness in guiding the sheep herd, we may consider developing new behaviors or optimizations to enhance adaptability, with the potential for further applications in fields like autonomous drone or robot control.
+This project explores the **[Sheepdog-Driven Algorithm for Sheep Herd Transport by Liu et al., 2021](https://doi.org/10.23919/CCC52363.2021.9549396)** which focuses on how a single agent (a "sheepdog") can guide and control a group (the "herd of sheep") to move from one location to another. The goal of this project was to replicate and evaluate this approach, specifically implementing the backward semi-circle reciprocation algorithm described in the paper.
 
 ## Team Members
 
@@ -13,30 +9,36 @@ After implementing the base algorithm, our team will experiment with its paramet
 - **Iva Idzojtic** - @viii-debug
 - **Lukas Pucher** - @DeinschneeweicherOnkel
 
-## Project Plan
+## Results
 
-### Starting Point
+A simulation based on the algorithm was developed, modeling the interactions between the sheepdog and the sheep using local interaction rules. Movement dynamics for both the sheep and sheepdog were defined, incorporating behaviors like attraction, repulsion, and visibility checks. Real-time position updates were implemented to simulate their behavior.
 
-We will begin by reviewing the Sheepdog-Driven Algorithm paper to understand the methodology, algorithmic details, and problem scope. We’ll implement a simulation environment that mimics the controlled sheep herd environment described in the paper, then gradually build up our understanding by coding a basic prototype of the algorithm.
+Additionally, a 3D visualization was created to help illustrate the dynamic interactions between the sheepdog and the herd, providing a clearer understanding of their movement patterns and the algorithm’s behavior.
 
-### Milestones and Timeline
+The plan was to experiment with various parameters and evaluate the algorithm’s performance under different conditions after implementing the base algorithm. However, while the simulation followed the methodology outlined in the paper, the herd was not consistently guided to the designated goal. The sheep’s movement responded to the sheepdog, but the dog was unable to lead the herd to the final destination as expected. These discrepancies suggest that further refinement or adjustments may be needed.
 
-#### First report
-- **Tasks**:
-  - Review the Sheepdog-Driven Algorithm paper
-  - Summarize key concepts
-  - Define project objectives
-  - Establish basic implementation requirements.
-- **Expected Outcome**: A detailed project outline.
+## Instructions
 
-#### Second report
-- **Tasks**:
-  - Implement the algorithm within the simulation environment.
-  - Collect initial data and assess the algorithm’s effectiveness, identifying any areas for improvement.
-- **Expected Outcome**: An operational simulation with preliminary results and insights for further adjustments.
+### Step 1: Set up Unity Project
+1. Create a new **Empty 3D project** in Unity.
+2. **Import the Unity package** (`.unitypackage`) provided with the project. This package includes all necessary assets and scripts for visualization.
 
-#### Final report
-- **Tasks**:
-  - Refine the algorithm based on previous findings.
-  - Finalize documentation, summarize results, and analyze the algorithm’s performance across different scenarios.
-- **Expected Outcome**: Finalized code, detailed analysis, and a completed project report.
+### Step 2: Import Textual Instructions (Optional)
+1. If you wish to include textual instructions, import the **TextMeshPro (TMP)** package in Unity.
+2. Ensure the appropriate TextMeshPro settings are configured to display the instructions correctly.
+
+### Step 3: Prepare Python Code
+1. Ensure that Python is installed on your system and the required libraries are available.
+2. Open the Python script that generates the movement data.
+3. Modify the following variables in the script to point to the correct directories:
+   - `EXTRACT_COORDS`: Set this flag to `True` to extract coordinates.
+   - `PATH_TO_UNITY_PROJECT`: Provide the path to your Unity project folder.
+
+### Step 4: Run the Python Simulation
+1. Execute the Python script. It will generate and save the `.json` files that contain the coordinates of the sheep and sheepdog entities during the simulation.
+2. These `.json` files are automatically updated as the simulation progresses.
+
+### Step 5: Run the Simulation
+1. Press the **Play** button in Unity to start the simulation.
+2. Watch the sheepdog and the sheep interact according to the algorithm's dynamics. The visualization will update based on the movement data provided by the Python simulation.
+3. During runtime, it is possible to modify simulation parameters (speed, current step, visualize paths...) through the gameobject Manager
